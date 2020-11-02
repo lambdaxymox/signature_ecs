@@ -1,3 +1,9 @@
+extern crate bitset;
+
+
+use std::collections::{
+    VecDeque
+};
 use std::fmt;
 
 
@@ -11,4 +17,15 @@ impl fmt::Display for Entity {
         write!(formatter, "{}", self.id)
     }
 }
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+struct ComponentType {
+    id: u16,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+struct Signature {
+    components: bitset::BitSet,
+}
+
 
