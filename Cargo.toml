@@ -7,6 +7,6 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies.bitset]
-version = "0.2.3"
+version = "0.2.4"
 git = "https://github.com/lambdaxymox/bitset"
 

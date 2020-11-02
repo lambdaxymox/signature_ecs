@@ -23,9 +23,21 @@ struct ComponentType {
     id: u16,
 }
 
+impl fmt::Display for ComponentType {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "{}", self.id)
+    }
+}
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 struct Signature {
     components: bitset::BitSet,
+}
+
+impl fmt::Display for Signature {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "Signature [{}]", self.components.as_string())
+    }
 }
 
 struct EntityManager {
