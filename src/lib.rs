@@ -28,4 +28,9 @@ struct Signature {
     components: bitset::BitSet,
 }
 
+struct EntityManager {
+    available_entities: VecDeque<Entity>,
+    signatures: Vec<Signature>,
+    living_entity_count: u32,
+}
 
