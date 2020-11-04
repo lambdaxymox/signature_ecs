@@ -1,5 +1,6 @@
 use crate::entity::{
     Entity,
+    Index,
 };
 
 use std::any::Any;
@@ -30,12 +31,18 @@ impl fmt::Display for ComponentType {
     }
 }
 
-pub trait ComponentStorage {
-    fn destroy_entity(&mut self, entity: Entity);
+pub trait UnsafeStorage<T> {
+    fn insert(&mut self, entity: Entity, component: T);
+
+    fn remove(&mut self, entity: Entity);
+
+    fn get(&self, entity: Entity) -> &T;
+
+    fn get_mut(&mut self, entity: Entity) -> &mut T;
 }
 
 
-struct PackedVecStorage<T> {
+pub struct PackedVecStorage<T> {
     data: Vec<T>,
     entity_to_index_map: HashMap<Entity, usize>,
     index_to_entity_map: HashMap<usize, Entity>,
@@ -54,7 +61,19 @@ impl<T> PackedVecStorage<T> where T: Copy {
         }
     }
 
-    pub fn insert(&mut self, entity: Entity, component: T) {
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.length
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.data.is_empty()
+    }
+}
+
+impl<T> UnsafeStorage<T> for PackedVecStorage<T> where T: Copy {
+    fn insert(&mut self, entity: Entity, component: T) {
         let new_index = self.length;
         self.entity_to_index_map.insert(entity, new_index);
         self.index_to_entity_map.insert(new_index, entity);
@@ -62,7 +81,7 @@ impl<T> PackedVecStorage<T> where T: Copy {
         self.length += 1;
     }
 
-    pub fn remove(&mut self, entity: Entity) {
+    fn remove(&mut self, entity: Entity) {
         let index_of_removed_entity = self.entity_to_index_map[&entity];
         let index_of_last_element = self.length - 1;
         self.data[index_of_removed_entity] = self.data[index_of_last_element];
@@ -76,28 +95,12 @@ impl<T> PackedVecStorage<T> where T: Copy {
         self.length -= 1;
     }
 
-    pub fn get(&self, entity: Entity) -> Option<&T> {
-        self.data.get(self.entity_to_index_map[&entity])
+    fn get(&self, entity: Entity) -> &T {
+        &self.data[self.entity_to_index_map[&entity]]
     }
 
-    pub fn get_mut(&mut self, entity: Entity) -> Option<&mut T> {
-        self.data.get_mut(self.entity_to_index_map[&entity])
-    }
-
-    pub fn len(&self) -> usize {
-        self.length
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.data.is_empty()
-    }
-}
-
-impl<T> ComponentStorage for PackedVecStorage<T> where T: Copy {
-    fn destroy_entity(&mut self, entity: Entity) {
-        if self.entity_to_index_map.get(&entity).is_some() {
-            self.remove(entity);
-        }
+    fn get_mut(&mut self, entity: Entity) -> &mut T {
+        &mut self.data[self.entity_to_index_map[&entity]]
     }
 }
 
