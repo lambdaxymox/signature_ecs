@@ -88,5 +88,9 @@ impl EntityManager {
     pub fn get_signature(&self, entity: EntityID) -> Signature {
         self.signatures[entity.id as usize]
     }
+
+    pub fn is_alive(&self, entity: EntityID) -> bool {
+        !self.available_entities.contains(&entity)
+    }
 }
 
