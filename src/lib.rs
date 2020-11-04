@@ -17,6 +17,7 @@ use std::fmt;
 
 mod entity;
 mod component;
+mod storage;
 
 
 use entity::{
