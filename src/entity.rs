@@ -5,7 +5,6 @@ use bitset::{
 
 use std::collections::{
     VecDeque,
-    HashMap,
 };
 use std::fmt;
 
@@ -16,14 +15,14 @@ pub type Signature = BitSet;
 
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub struct EntityID {
+pub struct Entity {
     id: Index,
 }
 
-impl EntityID {
+impl Entity {
     #[inline]
-    fn new(id: Index) -> EntityID {
-        EntityID {
+    fn new(id: Index) -> Entity {
+        Entity {
             id: id
         }
     }
@@ -34,14 +33,14 @@ impl EntityID {
     }
 }
 
-impl fmt::Display for EntityID {
+impl fmt::Display for Entity {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         write!(formatter, "{}", self.id)
     }
 }
 
 struct EntityManager {
-    available_entities: VecDeque<EntityID>,
+    available_entities: VecDeque<Entity>,
     signatures: Vec<Signature>,
     living_entity_count: usize,
     living_entity_capacity: usize,
@@ -51,7 +50,7 @@ impl EntityManager {
     pub fn new(capacity: usize) -> EntityManager {
         let mut available_entities = VecDeque::with_capacity(capacity);
         for entity_id in 0..capacity as u32 {
-            available_entities.push_back(EntityID::new(entity_id));
+            available_entities.push_back(Entity::new(entity_id));
         }
 
         let empty_signature = Signature::new();
@@ -65,7 +64,7 @@ impl EntityManager {
         }
     }
 
-    pub fn create_entity(&mut self) -> EntityID {
+    pub fn create_entity(&mut self) -> Entity {
         let id = self.available_entities.pop_front();
         if id.is_none() {
             panic!("Too many entities.");
@@ -75,21 +74,21 @@ impl EntityManager {
         id.unwrap()
     }
 
-    pub fn destroy_entity(&mut self, entity: EntityID) {
+    pub fn destroy_entity(&mut self, entity: Entity) {
         self.signatures[entity.id as usize].reset_all();
         self.available_entities.push_back(entity);
         self.living_entity_count -= 1;
     }
 
-    pub fn set_signature(&mut self, entity: EntityID, signature: Signature) {
+    pub fn set_signature(&mut self, entity: Entity, signature: Signature) {
         self.signatures[entity.id as usize] = signature;
     }
 
-    pub fn get_signature(&self, entity: EntityID) -> Signature {
+    pub fn get_signature(&self, entity: Entity) -> Signature {
         self.signatures[entity.id as usize]
     }
 
-    pub fn is_alive(&self, entity: EntityID) -> bool {
+    pub fn is_alive(&self, entity: Entity) -> bool {
         !self.available_entities.contains(&entity)
     }
 }

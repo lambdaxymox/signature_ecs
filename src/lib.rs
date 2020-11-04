@@ -19,7 +19,7 @@ mod entity;
 
 
 use entity::{
-    EntityID,
+    Entity,
 };
 
 
@@ -45,14 +45,14 @@ impl fmt::Display for ComponentType {
 }
 
 pub trait ComponentStorage {
-    fn destroy_entity(&mut self, entity: EntityID);
+    fn destroy_entity(&mut self, entity: Entity);
 }
 
 
 struct ComponentArray<T> {
     data: Vec<T>,
-    entity_to_index_map: HashMap<EntityID, usize>,
-    index_to_entity_map: HashMap<usize, EntityID>,
+    entity_to_index_map: HashMap<Entity, usize>,
+    index_to_entity_map: HashMap<usize, Entity>,
     length: usize,
     capacity: usize,
 }
@@ -68,7 +68,7 @@ impl<T> ComponentArray<T> where T: Copy {
         }
     }
 
-    pub fn insert(&mut self, entity: EntityID, component: T) {
+    pub fn insert(&mut self, entity: Entity, component: T) {
         let new_index = self.length;
         self.entity_to_index_map.insert(entity, new_index);
         self.index_to_entity_map.insert(new_index, entity);
@@ -76,7 +76,7 @@ impl<T> ComponentArray<T> where T: Copy {
         self.length += 1;
     }
 
-    pub fn remove(&mut self, entity: EntityID) {
+    pub fn remove(&mut self, entity: Entity) {
         let index_of_removed_entity = self.entity_to_index_map[&entity];
         let index_of_last_element = self.length - 1;
         self.data[index_of_removed_entity] = self.data[index_of_last_element];
@@ -90,7 +90,7 @@ impl<T> ComponentArray<T> where T: Copy {
         self.length -= 1;
     }
 
-    pub fn get(&self, entity: EntityID) -> Option<&T> {
+    pub fn get(&self, entity: Entity) -> Option<&T> {
         self.data.get(self.entity_to_index_map[&entity])
     }
 
@@ -104,7 +104,7 @@ impl<T> ComponentArray<T> where T: Copy {
 }
 
 impl<T> ComponentStorage for ComponentArray<T> where T: Copy {
-    fn destroy_entity(&mut self, entity: EntityID) {
+    fn destroy_entity(&mut self, entity: Entity) {
         if self.entity_to_index_map.get(&entity).is_some() {
             self.remove(entity);
         }
