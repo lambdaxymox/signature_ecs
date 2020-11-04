@@ -35,7 +35,7 @@ pub trait ComponentStorage {
 }
 
 
-struct ComponentArray<T> {
+struct PackedVecStorage<T> {
     data: Vec<T>,
     entity_to_index_map: HashMap<Entity, usize>,
     index_to_entity_map: HashMap<usize, Entity>,
@@ -43,9 +43,9 @@ struct ComponentArray<T> {
     capacity: usize,
 }
 
-impl<T> ComponentArray<T> where T: Copy {
-    pub fn new(capacity: usize) -> ComponentArray<T> {
-        ComponentArray {
+impl<T> PackedVecStorage<T> where T: Copy {
+    pub fn new(capacity: usize) -> PackedVecStorage<T> {
+        PackedVecStorage {
             data: Vec::with_capacity(capacity),
             entity_to_index_map: HashMap::new(),
             index_to_entity_map: HashMap::new(),
@@ -93,7 +93,7 @@ impl<T> ComponentArray<T> where T: Copy {
     }
 }
 
-impl<T> ComponentStorage for ComponentArray<T> where T: Copy {
+impl<T> ComponentStorage for PackedVecStorage<T> where T: Copy {
     fn destroy_entity(&mut self, entity: Entity) {
         if self.entity_to_index_map.get(&entity).is_some() {
             self.remove(entity);
