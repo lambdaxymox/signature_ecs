@@ -1,1 +1,1 @@
-# Simple Entity Component System
+# Signature Entity Component System
